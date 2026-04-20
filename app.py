@@ -18,13 +18,7 @@ def cargar_modelo():
     state_dict = torch.load("modelo_artistas.pth", map_location="cpu")
 
     # limpiar prefijos problemáticos
-    new_state_dict = {}
-    for k, v in state_dict.items():
-        k = k.replace("model.", "")
-        k = k.replace("module.", "")
-        new_state_dict[k] = v
-
-    model.load_state_dict(new_state_dict, strict=False)
+    model.load_state_dict(state_dict)
 
     model.eval()
     return model
