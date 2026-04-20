@@ -12,12 +12,14 @@ from arquitectura import ModeloArtistas
 CLASES = ['camille-pissarro', 'claude-monet', 'edgar-degas', 'pierre-auguste-renoir']
 
 @st.cache_resource
+from arquitectura import crear_modelo
+
+@st.cache_resource
 def cargar_modelo():
-    model = ModeloArtistas(num_classes=4)
+    model = crear_modelo(num_classes=4)
 
     state_dict = torch.load("modelo_artistas.pth", map_location="cpu")
 
-    # limpiar prefijos problemáticos
     model.load_state_dict(state_dict)
 
     model.eval()
