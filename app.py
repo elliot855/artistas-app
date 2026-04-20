@@ -9,7 +9,7 @@ from arquitectura import ModeloArtistas
 
 
 # Clases (ajústalas a tus artistas reales)
-CLASES = ["Van Gogh", "Picasso", "Monet", "Da Vinci"]
+CLASES = ['camille-pissarro', 'claude-monet', 'edgar-degas', 'pierre-auguste-renoir']
 
 @st.cache_resource
 def cargar_modelo():
