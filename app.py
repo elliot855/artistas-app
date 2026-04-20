@@ -11,15 +11,20 @@ from arquitectura import ModeloArtistas
 # Clases (ajústalas a tus artistas reales)
 CLASES = ['camille-pissarro', 'claude-monet', 'edgar-degas', 'pierre-auguste-renoir']
 
-from arquitectura import crear_modelo
-
 @st.cache_resource
 def cargar_modelo():
-    model = crear_modelo(num_classes=4)
+    model = ModeloArtistas(num_classes=4)
 
     state_dict = torch.load("modelo_artistas.pth", map_location="cpu")
 
-    model.load_state_dict(state_dict)
+    # limpiar prefijos problemáticos
+    new_state_dict = {}
+    for k, v in state_dict.items():
+        k = k.replace("model.", "")
+        k = k.replace("module.", "")
+        new_state_dict[k] = v
+
+    model.load_state_dict(new_state_dict, strict=False)
 
     model.eval()
     return model
@@ -61,6 +66,11 @@ if uploaded_file:
     cam = generar_gradcam(model, img_tensor)
 
     heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
+
+    img_np = np.array(image.resize((224, 224)))
+    superpuesta = heatmap * 0.4 + img_np
+
+    st.image(superpuesta.astype(np.uint8), caption="Grad-CAM")
 
     img_np = np.array(image.resize((224, 224)))
     superpuesta = heatmap * 0.4 + img_np
