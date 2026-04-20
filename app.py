@@ -10,16 +10,18 @@ from arquitectura import ModeloArtistas
 # Clases (ajústalas a tus artistas reales)
 CLASES = ["Van Gogh", "Picasso", "Monet", "Da Vinci"]
 
-# Cargar modelo
+@st.cache_resource
 def cargar_modelo():
     model = ModeloArtistas(num_classes=4)
 
     state_dict = torch.load("modelo_artistas.pth", map_location="cpu")
 
+    # limpiar prefijos problemáticos
     new_state_dict = {}
     for k, v in state_dict.items():
-        new_key = k.replace("model.", "")  # 👈 clave
-        new_state_dict[new_key] = v
+        k = k.replace("model.", "")
+        k = k.replace("module.", "")
+        new_state_dict[k] = v
 
     model.load_state_dict(new_state_dict, strict=False)
 
