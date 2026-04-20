@@ -1,4 +1,7 @@
 import torch
+import cv2
+import numpy as np
+
 def generar_gradcam(model, imagen_tensor):
     gradientes = []
     activaciones = []
