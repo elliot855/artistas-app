@@ -41,57 +41,41 @@ transform = transforms.Compose([
     )
 ])
 
-# 4. Interfaz de Usuario
-st.set_page_config(page_title="IA Clasificador de Arte", page_icon="🎨")
+# --- INTERFAZ ORIGINAL ---
 st.title("🎨 Clasificador de Obras de Arte")
-st.write("Identifica al autor de una pintura usando Inteligencia Artificial.")
 
-# Selector de entrada
-opcion = st.radio("Selecciona una opción:", ("Subir imagen de la galería", "Tomar una foto con la cámara"))
+# Mantenemos el cargador de archivos original
+uploaded_file = st.file_uploader("Sube una imagen", type=["jpg", "png"])
 
-imagen_pil = None
+# Añadimos la cámara justo debajo (esto activará la cámara en tu Android)
+foto_camara = st.camera_input("O toma una foto directamente")
 
-if opcion == "Subir imagen de la galería":
-    archivo = st.file_uploader("Elige una imagen...", type=["jpg", "jpeg", "png"])
-    if archivo is not None:
-        imagen_pil = Image.open(archivo).convert("RGB")
+# Lógica para decidir qué imagen procesar (archivo o cámara)
+image_file = None
+if uploaded_file is not None:
+    image_file = uploaded_file
+elif foto_camara is not None:
+    image_file = foto_camara
 
-else:
-    # Esta opción activa la cámara en Android/iOS cuando abres el link
-    foto = st.camera_input("Enfoca la obra de arte")
-    if foto is not None:
-        imagen_pil = Image.open(foto).convert("RGB")
+# Si hay alguna imagen seleccionada, hacemos la predicción
+if image_file:
+    image = Image.open(image_file).convert("RGB")
+    st.image(image, caption="Imagen para analizar", use_container_width=True)
 
-# 5. Ejecutar Predicción si hay una imagen
-if imagen_pil is not None:
-    st.image(imagen_pil, caption="Imagen seleccionada", use_container_width=True)
-    
     # Preprocesamiento
-    img_tensor = transform(imagen_pil).unsqueeze(0)
+    img_tensor = transform(image).unsqueeze(0)
 
-    # Inferencia
+    # Inferencia (Predicción)
     with torch.no_grad():
         outputs = model(img_tensor)
         probs = torch.nn.functional.softmax(outputs, dim=1)
-        pred_idx = torch.argmax(probs, dim=1).item()
+        pred = torch.argmax(probs, dim=1).item()
 
-    # Mostrar Resultados
-    artista_predicho = CLASES[pred_idx].replace('-', ' ').title()
-    confianza = probs[0][pred_idx].item()
-
-    st.success(f"### 🎯 Predicción: **{artista_predicho}**")
-    st.write(f"Nivel de confianza: **{confianza:.2%}**")
-
-    st.write("---")
-    st.write("### 📊 Probabilidades por artista:")
+    # Resultados (Interfaz original)
+    st.subheader(f"🎯 Predicción: {CLASES[pred]}")
+    st.write(f"**Confianza:** {probs[0][pred]:.2%}")
     
-    # Mostrar barras de probabilidad
-    for i, nombre_clase in enumerate(CLASES):
-        p = probs[0][i].item()
-        nombre_bonito = nombre_clase.replace('-', ' ').title()
-        st.write(f"**{nombre_bonito}**")
-        st.progress(p)
-        st.write("Probabilidades:")
-        for i, clase in enumerate(CLASES):
-            st.write(f"{clase}: {probs[0][i]:.4f}")
+    st.write("Probabilidades detalladas:")
+    for i, clase in enumerate(CLASES):
+        st.write(f"{clase.replace('-', ' ').title()}: {probs[0][i]:.4f}")
 
