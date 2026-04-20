@@ -61,7 +61,7 @@ if uploaded_file:
     for i, clase in enumerate(CLASES):
         st.write(f"{clase}: {probs[0][i]:.4f}")
 
-    # 🔥 Grad-CAM AQUÍ dentro
+# 🔥 Grad-CAM AQUÍ dentro
     from utils import generar_gradcam
 
     cam = generar_gradcam(model, img_tensor)
