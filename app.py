@@ -15,8 +15,8 @@ CLASES = ['camille-pissarro', 'claude-monet', 'edgar-degas', 'pierre-auguste-ren
 def cargar_modelo():
     model = ModeloArtistas(num_classes=4)
 
-    # 1. Cargar el archivo correcto (modelo_artistas2.pth)
-    state_dict = torch.load("modelo_artistas2.pth", map_location="cpu")
+    # 1. Cargar el archivo correcto (modelo_artistas.pth)
+    state_dict = torch.load("modelo_artistas.pth", map_location="cpu")
 
     # 2. Arreglar las llaves del diccionario: Añadir "model."
     new_state_dict = {}
