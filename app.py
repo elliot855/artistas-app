@@ -71,9 +71,6 @@ if uploaded_file:
     img_np = np.array(image.resize((224, 224)))
     superpuesta = heatmap * 0.4 + img_np
 
-    st.image(superpuesta.astype(np.uint8), caption="Grad-CAM")
-
-    img_np = np.array(image.resize((224, 224)))
     superpuesta = heatmap * 0.4 + img_np
 
     st.image(superpuesta.astype(np.uint8), caption="Grad-CAM")
