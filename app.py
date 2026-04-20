@@ -61,16 +61,3 @@ if uploaded_file:
     for i, clase in enumerate(CLASES):
         st.write(f"{clase}: {probs[0][i]:.4f}")
 
-# 🔥 Grad-CAM AQUÍ dentro
-    from utils import generar_gradcam
-
-    cam = generar_gradcam(model, img_tensor)
-
-    heatmap = cv2.applyColorMap(np.uint8(255 * cam), cv2.COLORMAP_JET)
-
-    img_np = np.array(image.resize((224, 224)))
-    superpuesta = heatmap * 0.4 + img_np
-
-    superpuesta = heatmap * 0.4 + img_np
-
-    st.image(superpuesta.astype(np.uint8), caption="Grad-CAM")
