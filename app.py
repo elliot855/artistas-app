@@ -41,30 +41,56 @@ transform = transforms.Compose([
     )
 ])
 
+# 4. Interfaz de Usuario
+st.set_page_config(page_title="IA Clasificador de Arte", page_icon="🎨")
 st.title("🎨 Clasificador de Obras de Arte")
+st.write("Identifica al autor de una pintura usando Inteligencia Artificial.")
 
-# Opción para subir imagen o tomar foto
-opcion = st.radio("Elige cómo subir la imagen:", ("Subir archivo", "Tomar foto"))
+# Selector de entrada
+opcion = st.radio("Selecciona una opción:", ("Subir imagen de la galería", "Tomar una foto con la cámara"))
 
-if opcion == "Subir archivo":
-    uploaded_file = st.file_uploader("Sube una imagen", type=["jpg", "png"])
-    if uploaded_file:
-        image = Image.open(uploaded_file).convert("RGB")
-        # (Aquí va tu código de predicción normal...)
+imagen_pil = None
 
-elif opcion == "Tomar foto":
-    foto = st.camera_input("Toma una foto de la obra")
-    if foto:
-        image = Image.open(foto).convert("RGB")
-        
-        # Copias y pegas tu código de predicción aquí
-        img_tensor = transform(image).unsqueeze(0)
-        with torch.no_grad():
-            outputs = model(img_tensor)
-            probs = torch.nn.functional.softmax(outputs, dim=1)
-            pred = torch.argmax(probs, dim=1).item()
-            
-        st.subheader(f"🎯 Predicción: {CLASES[pred]}")
+if opcion == "Subir imagen de la galería":
+    archivo = st.file_uploader("Elige una imagen...", type=["jpg", "jpeg", "png"])
+    if archivo is not None:
+        imagen_pil = Image.open(archivo).convert("RGB")
+
+else:
+    # Esta opción activa la cámara en Android/iOS cuando abres el link
+    foto = st.camera_input("Enfoca la obra de arte")
+    if foto is not None:
+        imagen_pil = Image.open(foto).convert("RGB")
+
+# 5. Ejecutar Predicción si hay una imagen
+if imagen_pil is not None:
+    st.image(imagen_pil, caption="Imagen seleccionada", use_container_width=True)
+    
+    # Preprocesamiento
+    img_tensor = transform(imagen_pil).unsqueeze(0)
+
+    # Inferencia
+    with torch.no_grad():
+        outputs = model(img_tensor)
+        probs = torch.nn.functional.softmax(outputs, dim=1)
+        pred_idx = torch.argmax(probs, dim=1).item()
+
+    # Mostrar Resultados
+    artista_predicho = CLASES[pred_idx].replace('-', ' ').title()
+    confianza = probs[0][pred_idx].item()
+
+    st.success(f"### 🎯 Predicción: **{artista_predicho}**")
+    st.write(f"Nivel de confianza: **{confianza:.2%}**")
+
+    st.write("---")
+    st.write("### 📊 Probabilidades por artista:")
+    
+    # Mostrar barras de probabilidad
+    for i, nombre_clase in enumerate(CLASES):
+        p = probs[0][i].item()
+        nombre_bonito = nombre_clase.replace('-', ' ').title()
+        st.write(f"**{nombre_bonito}**")
+        st.progress(p)
         st.write("Probabilidades:")
         for i, clase in enumerate(CLASES):
             st.write(f"{clase}: {probs[0][i]:.4f}")
