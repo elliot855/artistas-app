@@ -28,6 +28,7 @@ def cargar_modelo():
 
     model.eval()
     return model
+model = cargar_modelo()
 
 # Transformaciones
 transform = transforms.Compose([
