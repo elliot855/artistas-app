@@ -1,7 +1,3 @@
-import torch
-import cv2
-import numpy as np
-
 def generar_gradcam(model, imagen_tensor):
     gradientes = []
     activaciones = []
@@ -12,7 +8,8 @@ def generar_gradcam(model, imagen_tensor):
     def forward_hook(module, input, output):
         activaciones.append(output)
 
-    capa_objetivo = model.model.features[-1]
+    # 👇 CAMBIO AQUÍ
+    capa_objetivo = model.model.conv_head
 
     capa_objetivo.register_forward_hook(forward_hook)
     capa_objetivo.register_backward_hook(backward_hook)
