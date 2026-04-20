@@ -7,12 +7,6 @@ from torchvision import transforms
 
 from arquitectura import ModeloArtistas
 
-model = None
-
-try:
-    model = cargar_modelo()
-except Exception as e:
-    st.error(f"Error cargando modelo: {e}")
 
 # Clases (ajústalas a tus artistas reales)
 CLASES = ["Van Gogh", "Picasso", "Monet", "Da Vinci"]
