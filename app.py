@@ -11,7 +11,6 @@ from arquitectura import ModeloArtistas
 # Clases (ajústalas a tus artistas reales)
 CLASES = ['camille-pissarro', 'claude-monet', 'edgar-degas', 'pierre-auguste-renoir']
 
-@st.cache_resource
 from arquitectura import crear_modelo
 
 @st.cache_resource
