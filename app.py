@@ -15,16 +15,17 @@ CLASES = ['camille-pissarro', 'claude-monet', 'edgar-degas', 'pierre-auguste-ren
 def cargar_modelo():
     model = ModeloArtistas(num_classes=4)
 
-    state_dict = torch.load("modelo_artistas.pth", map_location="cpu")
+    # 1. Cargar el archivo correcto (modelo_artistas2.pth)
+    state_dict = torch.load("modelo_artistas2.pth", map_location="cpu")
 
-    # limpiar prefijos problemáticos
+    # 2. Arreglar las llaves del diccionario: Añadir "model."
     new_state_dict = {}
     for k, v in state_dict.items():
-        k = k.replace("model.", "")
-        k = k.replace("module.", "")
-        new_state_dict[k] = v
+        # Como CNN.py guardó las capas sin "model.", se lo agregamos
+        new_state_dict[f"model.{k}"] = v
 
-    model.load_state_dict(new_state_dict, strict=False)
+    # 3. Cargar pesos usando strict=True para asegurarnos de que todo encaje
+    model.load_state_dict(new_state_dict, strict=True)
 
     model.eval()
     return model
