@@ -43,21 +43,29 @@ transform = transforms.Compose([
 
 st.title("🎨 Clasificador de Obras de Arte")
 
-uploaded_file = st.file_uploader("Sube una imagen", type=["jpg", "png"])
+# Opción para subir imagen o tomar foto
+opcion = st.radio("Elige cómo subir la imagen:", ("Subir archivo", "Tomar foto"))
 
-if uploaded_file:
-    image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Imagen subida", use_column_width=True)
+if opcion == "Subir archivo":
+    uploaded_file = st.file_uploader("Sube una imagen", type=["jpg", "png"])
+    if uploaded_file:
+        image = Image.open(uploaded_file).convert("RGB")
+        # (Aquí va tu código de predicción normal...)
 
-    img_tensor = transform(image).unsqueeze(0)
-
-    with torch.no_grad():
-        outputs = model(img_tensor)
-        probs = torch.nn.functional.softmax(outputs, dim=1)
-        pred = torch.argmax(probs, dim=1).item()
-
-    st.subheader(f"🎯 Predicción: {CLASES[pred]}")
-    st.write("Probabilidades:")
-    for i, clase in enumerate(CLASES):
-        st.write(f"{clase}: {probs[0][i]:.4f}")
+elif opcion == "Tomar foto":
+    foto = st.camera_input("Toma una foto de la obra")
+    if foto:
+        image = Image.open(foto).convert("RGB")
+        
+        # Copias y pegas tu código de predicción aquí
+        img_tensor = transform(image).unsqueeze(0)
+        with torch.no_grad():
+            outputs = model(img_tensor)
+            probs = torch.nn.functional.softmax(outputs, dim=1)
+            pred = torch.argmax(probs, dim=1).item()
+            
+        st.subheader(f"🎯 Predicción: {CLASES[pred]}")
+        st.write("Probabilidades:")
+        for i, clase in enumerate(CLASES):
+            st.write(f"{clase}: {probs[0][i]:.4f}")
 
