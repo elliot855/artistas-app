@@ -11,14 +11,20 @@ from arquitectura import ModeloArtistas
 CLASES = ["Van Gogh", "Picasso", "Monet", "Da Vinci"]
 
 # Cargar modelo
-@st.cache_resource
 def cargar_modelo():
     model = ModeloArtistas(num_classes=4)
-    model.load_state_dict(torch.load("modelo_artistas.pth", map_location="cpu"))
+
+    state_dict = torch.load("modelo_artistas.pth", map_location="cpu")
+
+    new_state_dict = {}
+    for k, v in state_dict.items():
+        new_key = k.replace("model.", "")  # 👈 clave
+        new_state_dict[new_key] = v
+
+    model.load_state_dict(new_state_dict, strict=False)
+
     model.eval()
     return model
-
-model = cargar_modelo()
 
 # Transformaciones
 transform = transforms.Compose([
